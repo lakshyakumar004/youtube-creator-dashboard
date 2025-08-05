@@ -3,6 +3,31 @@ const router = express.Router();
 const protect = require('../middlewares/authMiddleware');
 const Video = require('../models/Video');
 
+// For upload route
+const multer = require('multer');
+const { v2: cloudinary } = require('cloudinary');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const User = require('../models/User');
+
+// Cloudinary config
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'ytcreator-edits',
+    resource_type: 'video',
+    format: async () => 'mp4',
+    public_id: (req, file) => `${Date.now()}-${file.originalname}`,
+  },
+});
+
+const upload = multer({ storage });
+
 // @desc    Get all videos uploaded by the logged-in creator
 // @route   GET /api/videos/mine
 // @access  Private
@@ -72,5 +97,90 @@ router.get('/assigned', protect, async (req, res) => {
     res.status(500).json({ message: 'Server error fetching assigned videos' });
   }
 });
+
+// @desc    Editor uploads edited video for a creator
+// @route   POST /api/videos/upload-for-creator
+// @access  Private (Editor)
+router.post('/upload-for-creator', protect, upload.single('video'), async (req, res) => {
+  try {
+    const { creatorId } = req.body;
+
+    const creator = await User.findById(creatorId);
+    if (!creator || creator.role !== 'creator') {
+      return res.status(400).json({ message: 'Invalid creator ID' });
+    }
+
+    const video = new Video({
+      url: req.file.path,
+      public_id: req.file.filename || req.file.public_id,
+      uploadedBy: req.user.userId,
+      uploadedFor: creatorId,
+      originalName: req.file.originalname,
+      status: 'edited',
+    });
+
+    await video.save();
+    res.status(201).json({ message: 'Video uploaded successfully', video });
+  } catch (err) {
+    console.error('Error uploading video:', err);
+    res.status(500).json({ message: 'Server error uploading video' });
+  }
+});
+
+// @desc    Get all creators (for editor to choose by name)
+// @route   GET /api/videos/creators
+// @access  Private (Editor)
+router.get('/creators', protect, async (req, res) => {
+  try {
+    const creators = await User.find({ role: 'creator' }).select('_id name email');
+    res.json(creators);
+  } catch (err) {
+    console.error('Failed to fetch creators:', err);
+    res.status(500).json({ message: 'Server error fetching creators' });
+  }
+});
+
+// @desc    Creator uploads a video for a specific editor
+// @route   POST /api/videos/upload-for-editor
+// @access  Private (Creator)
+router.post('/upload-for-editor', protect, upload.single('video'), async (req, res) => {
+  try {
+    const { editorId } = req.body;
+
+    const editor = await User.findById(editorId);
+    if (!editor || editor.role !== 'editor') {
+      return res.status(400).json({ message: 'Invalid editor ID' });
+    }
+
+    const video = new Video({
+      url: req.file.path,
+      public_id: req.file.filename || req.file.public_id,
+      uploadedBy: req.user.userId,
+      originalName: req.file.originalname,
+      status: 'pending',
+      assignedEditors: [editorId],  // assign to selected editor
+    });
+
+    await video.save();
+    res.status(201).json({ message: 'Video uploaded and assigned to editor', video });
+  } catch (err) {
+    console.error('Error uploading video for editor:', err);
+    res.status(500).json({ message: 'Server error uploading video' });
+  }
+});
+
+// @desc    Get all editors (for creator to choose by name/email)
+// @route   GET /api/videos/editors
+// @access  Private (Creator)
+router.get('/editors', protect, async (req, res) => {
+  try {
+    const editors = await User.find({ role: 'editor' }).select('_id name email');
+    res.json(editors);
+  } catch (err) {
+    console.error('Failed to fetch editors:', err);
+    res.status(500).json({ message: 'Server error fetching editors' });
+  }
+});
+
 
 module.exports = router;
