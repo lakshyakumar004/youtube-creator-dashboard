@@ -11,6 +11,10 @@ const videoSchema = new mongoose.Schema({
     default: 'pending' 
   },
   uploadedAt: { type: Date, default: Date.now },
+  assignedEditors: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }]
 });
 
 module.exports = mongoose.model('Video', videoSchema);
