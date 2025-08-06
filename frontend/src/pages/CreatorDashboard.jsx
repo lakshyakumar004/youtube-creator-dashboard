@@ -291,7 +291,7 @@ const CreatorDashboard = () => {
       </Container>
 
       <Box py="lg" style={{ background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(10px)', borderTop: '1px solid rgba(255, 255, 255, 0.2)', textAlign: 'center' }}>
-        <Text size="sm" style={{ color: '#6b7280', fontWeight: 500 }}>© 2025 Creator Studio Platform. Crafted with ❤️ for creators.</Text>
+        <Text size="sm" style={{ color: '#6b7280', fontWeight: 500 }}>© 2025 Creator Studio Platform. </Text>
       </Box>
     </Box>
   );
