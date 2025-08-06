@@ -417,7 +417,7 @@ const EditorDashboard = () => {
         }}
       >
         <Text size="sm" style={{ color: '#6b7280', fontWeight: 500 }}>
-          © 2025 Editor Studio Platform. Crafted with ❤️ for editors.
+          © 2025 Editor Studio Platform.
         </Text>
       </Box>
     </Box>
