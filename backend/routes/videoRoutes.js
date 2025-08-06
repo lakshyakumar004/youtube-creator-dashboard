@@ -59,6 +59,9 @@ router.post('/:videoId/assign-editor', protect, async (req, res) => {
 
     if (!video.assignedEditors.includes(editorId)) {
       video.assignedEditors.push(editorId);
+      if (!video.uploadedFor) {
+        video.uploadedFor = video.uploadedBy;
+      }
       await video.save();
     }
 
@@ -182,5 +185,47 @@ router.get('/editors', protect, async (req, res) => {
   }
 });
 
+router.get('/for-me', protect, async (req, res) => {
+  try {
+    const videos = await Video.find({ uploadedFor: req.user.userId }).sort({ uploadedAt: -1 });
+    res.json(videos);
+  } catch (err) {
+    console.error('Failed to fetch editor videos for creator:', err);
+    res.status(500).json({ message: 'Server error fetching editor videos' });
+  }
+});
+
+// @desc    Delete a video (creator only)
+// @route   DELETE /api/videos/:videoId
+// @access  Private
+router.delete('/:videoId', protect, async (req, res) => {
+  try {
+    const video = await Video.findById(req.params.videoId);
+
+    if (!video) {
+      return res.status(404).json({ message: 'Video not found' });
+    }
+
+    // Only the user who uploaded it can delete
+    if (video.uploadedBy.toString() !== req.user.userId) {
+      return res.status(403).json({ message: 'Not authorized to delete this video' });
+    }
+
+    // Delete from Cloudinary
+    if (video.public_id) {
+      await cloudinary.uploader.destroy(video.public_id, {
+        resource_type: 'video',
+      });
+    }
+
+    // Delete from MongoDB
+    await video.deleteOne();
+
+    res.status(200).json({ message: 'Video deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting video:', err);
+    res.status(500).json({ message: 'Server error deleting video' });
+  }
+});
 
 module.exports = router;
