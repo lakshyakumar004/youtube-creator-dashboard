@@ -241,26 +241,45 @@ const CreatorDashboard = () => {
             </Paper>
 
             {/* Edited Videos */}
-            {editedVideos.length > 0 && (
-              <Paper p="lg" radius="xl" mt="xl" style={{ background: 'rgba(255, 255, 255, 0.95)' }}>
-                <Title order={3} style={{ background: 'linear-gradient(45deg, #667eea, #764ba2)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontWeight: 600, marginBottom: rem(16) }}>
-                  🎞️ Edited Videos From Editors
-                </Title>
-                <Divider />
-                <Stack spacing="md" mt="lg">
-                  {editedVideos.map((vid) => (
-                    <Paper key={vid._id} shadow="md" p="lg" radius="lg">
-                      <Group position="apart" mb="sm">
-                        <Text fw={600}>🎞️ {vid.originalName}</Text>
-                        <Badge variant="gradient" gradient={{ from: 'blue', to: 'cyan' }}>✏️ EDITED</Badge>
-                      </Group>
-                      <Text size="sm" style={{ color: '#6b7280' }}>📅 Edited: {new Date(vid.uploadedAt).toLocaleString()}</Text>
-                      <Anchor href={vid.url} target="_blank">▶️ Watch Edited Video</Anchor>
-                    </Paper>
-                  ))}
-                </Stack>
+            {editedVideos.map((vid) => (
+              <Paper key={vid._id} shadow="md" p="lg" radius="lg">
+                <Group position="apart" mb="sm">
+                  <Text fw={600}>🎞️ {vid.originalName}</Text>
+                  <Group>
+                    <Badge variant="gradient" gradient={{ from: 'blue', to: 'cyan' }}>✏️ EDITED</Badge>
+                    {vid.youtubeVideoId && (
+                      <Badge variant="gradient" gradient={{ from: 'green', to: 'lime' }}>📤 UPLOADED</Badge>
+                    )}
+                  </Group>
+                </Group>
+                <Text size="sm" style={{ color: '#6b7280' }}>📅 Edited: {new Date(vid.uploadedAt).toLocaleString()}</Text>
+                <Anchor href={vid.url} target="_blank">▶️ Watch Edited Video</Anchor>
+
+                {!vid.youtubeVideoId && (
+                  <Button
+                    mt="sm"
+                    variant="outline"
+                    color="red"
+                    onClick={() => {
+                      const videoId = vid._id;
+                      window.location.href = `http://localhost:5000/api/auth/google?videoId=${videoId}`;
+                    }}
+                  >
+                    🚀 Upload to YouTube
+                  </Button>
+                )}
+
+                <Button
+                  onClick={() => handleDelete(vid._id)}
+                  size="xs"
+                  color="red"
+                  mt="md"
+                  leftIcon={<IconTrash size={14} />}
+                >
+                  Delete Video
+                </Button>
               </Paper>
-            )}
+            ))}
           </Stack>
         </Stack>
 

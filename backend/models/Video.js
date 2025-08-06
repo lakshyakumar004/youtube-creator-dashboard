@@ -25,6 +25,7 @@ const videoSchema = new mongoose.Schema({
       ref: 'User',
     },
   ],
+  youtubeVideoId: { type: String },
 });
 
 module.exports = mongoose.model('Video', videoSchema);

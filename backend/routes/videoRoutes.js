@@ -207,7 +207,7 @@ router.delete('/:videoId', protect, async (req, res) => {
     }
 
     // Only the user who uploaded it can delete
-    if (video.uploadedBy.toString() !== req.user.userId) {
+    if (video.uploadedBy.toString() !== req.user.userId && video.uploadedFor.toString() !== req.user.userId) {
       return res.status(403).json({ message: 'Not authorized to delete this video' });
     }
 
