@@ -114,7 +114,7 @@ try {
             <Stack spacing="lg">
               <TextInput
                 label="Full Name"
-                placeholder="e.g. Alex Johnson"
+                placeholder="e.g. Tony Stark"
                 required
                 size="md"
                 radius="md"
