@@ -24,15 +24,7 @@ A full-stack dashboard for creators and editors to manage videos, collaborate, a
 
 ---
 
-## 🧱 Architecture
-React (client)
-   ↕  HTTPS (JWT)
-Express / Node.js (server)
-   ├─ MongoDB (Mongoose models: User, Video)
-   ├─ Cloudinary (upload + asset management)
-   └─ YouTube Data API v3 (OAuth 2.0 publish)
 
----
 ## 🖼️ Screenshots
 
 **Sign In —** Secure login for creators and editors using email/password (JWT session).
@@ -57,7 +49,7 @@ Express / Node.js (server)
 
 **Google OAuth — YouTube Consent —** One-time OAuth 2.0 consent for publishing via the YouTube Data API.
 <br>
-<img src="assets/google-oauth.png" alt="Google OAuth consent screen" width="900"/>
+<img src="assets/google-auth.png" alt="Google OAuth consent screen" width="900"/>
 
 
 ## 🚀 Getting Started
