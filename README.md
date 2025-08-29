@@ -53,7 +53,7 @@ Express / Node.js (server)
 
 **Editor Studio — Assigned Work —** Editors see videos assigned to them and can upload edited versions back to the creator.
 <br>
-<img src="assets/editor-studio.jpg" alt="Editor Studio with videos to edit and upload edited video" width="900"/>
+<img src="assets/editor-studio.jpg" alt="Editor Studio with videos to edit and upload edited video  " width="900"/>
 
 **Google OAuth — YouTube Consent —** One-time OAuth 2.0 consent for publishing via the YouTube Data API.
 <br>
